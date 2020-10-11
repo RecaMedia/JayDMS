@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 require 'utilities.php';
 
 class JayDMS extends Utilities {
@@ -6,6 +7,7 @@ class JayDMS extends Utilities {
   private static $instance;
   private $installed = false;
   private $config_file_path = "";
+  private $core_dir_path = "";
   private $users_file_path = "";
   private $all_users_data = null;
   private $form_error = false;
@@ -28,20 +30,22 @@ class JayDMS extends Utilities {
     }
 
     // Get file path to config
-    $this->config_file_path = dirname(__DIR__) . DIRECTORY_SEPARATOR . basename(__DIR__) . "/config.php";
+    $this->config_file_path = dirname(__DIR__) . DIRECTORY_SEPARATOR . basename(__DIR__) . "\config.php";
 
+    // Absolute path to "/jdms" directory
+    $jdms_dir = dirname(dirname(dirname(__DIR__)));
+
+    // Path to core directory
+    $this->core_dir_path = $jdms_dir . '\content\data\core';
+    
     // Get file path to users
-    $core_dir = dirname(dirname(dirname(__DIR__))) . '/content/data/core';
-    if (!is_dir($core_dir)) {
-      mkdir($core_dir);
-    }
-    $this->users_file_path = $core_dir . '/users.json';
+    $this->users_file_path = $jdms_dir . '\content\data\core\users.json';
 
     // Handle install form submission before checking for config and user files
     $this->catchFormSubmission("install");
 
     // Check if files exist, if so, installation has been done
-    if (!file_exists($this->config_file_path) && !file_exists($this->users_file_path)) {
+    if (!file_exists($this->config_file_path) || !file_exists($this->users_file_path)) {
       // Launch installation process
       $this->launchInstallation();
     } else {
