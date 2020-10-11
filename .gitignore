@@ -1,2 +1,5 @@
 jdms/admin/core/controller/config.php
 jdms/admin/index.html
+jdms/admin/assets/css/admin.css
+jdms/admin/assets/js/admin.js
+jdms/content/data/core/

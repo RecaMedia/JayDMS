@@ -36,20 +36,29 @@ $configurations = (object) array(
 date_default_timezone_set("'.$timezone.'");
 ?>';
 
-// Create config file
-$file = fopen($this->config_file_path, "w+"); // config_file_path is defined in parent file
-fwrite($file, $config_file_data);
-fclose($file);
+// Create core directory
+mkdir($this->core_dir_path, 0777);
 
-// Verify file has been created
-$config_file_ready = false;
-if (file_exists($this->config_file_path)) {
-  $config_file_ready = true;
-  // Setting temporary config value since file was just created and needs to exist for the encrypt function
-  $this->config = (object) array("saltKey" => $salt);
+// If successful...
+if (is_dir ($this->core_dir_path)) {
+  // Create config file
+  $config_file = fopen($this->config_file_path, "x"); // config_file_path is defined in parent file
+  fwrite($config_file, $config_file_data);
+  fclose($config_file);
+
+  // Verify file has been created
+  $config_file_ready = false;
+  if (file_exists($this->config_file_path)) {
+    $config_file_ready = true;
+    // Setting temporary config value since file was just created and needs to exist for the encrypt function
+    $this->config = (object) array("saltKey" => $salt);
+  } else {
+    $this->form_error = true;
+    $this->form_error_msg .= 'Unable to create configuration file. Please check your PHP and permission settings.<br />';
+  }
 } else {
   $this->form_error = true;
-  $this->form_error_msg .= 'Unable to create configuration file. Please check your PHP and permission settings.<br />';
+  $this->form_error_msg .= 'Unable to create core directory. Please check your PHP and permission settings.<br />';
 }
 
 
@@ -111,9 +120,9 @@ if ($config_file_ready && isset($_POST['initializeusers'])) {
     );
 
     // Create users file
-    $file = fopen($this->users_file_path, "w+"); // user_file_path is defined in parent file
-    fwrite($file, json_encode($all_user_file_data));
-    fclose($file);
+    $user_file = fopen($this->users_file_path, "x"); // user_file_path is defined in parent file
+    fwrite($user_file, json_encode($all_user_file_data));
+    fclose($user_file);
 
     // Verify file has been created
     $user_file_ready = false;
